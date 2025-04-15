@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Analysis Tool</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --bg-color: #f5f7fa;
+            --text-color: #333;
+            --card-bg: #fff;
+            --border-color: #e0e0e0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .secondary-btn {
+            background-color: #78909c;
+        }
+        
+        .secondary-btn:hover {
+            background-color: #607d8b;
+        }
+        
+        .clear-btn {
+            background-color: #ef5350;
+        }
+        
+        .clear-btn:hover {
+            background-color: #e53935;
+        }
+        
+        .results-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .analysis-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            color: var(--secondary-color);
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .count-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        
+        .count-item:last-child {
+            border-bottom: none;
+        }
+        
+        .word-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .sample-options {
+            margin-top: 10px;
+        }
+        
+        .custom-url {
+            display: flex;
+            margin-top: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .custom-url input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+        
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+        }
+        
+        @media (max-width: 768px) {
+            .results-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-group {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Text Analysis Tool</h1>
+        
+        <div class="input-section">
+            <textarea id="text-input" placeholder="Enter text to analyze (capacity: over 10,000 words)"></textarea>
+            
+            <div class="button-group">
+                <button id="analyze-btn">Analyze Text</button>
+                <button id="load-sample-btn" class="secondary-btn">Load Sample Text</button>
+                <button id="clear-btn" class="clear-btn">Clear</button>
+            </div>
+            
+            <div class="sample-options">
+                <label for="sample-selector">Choose a sample text:</label>
+                <select id="sample-selector">
+                    <option value="gutenberg1">Gutenberg: Pride and Prejudice</option>
+                    <option value="gutenberg2">Gutenberg: Alice in Wonderland</option>
+                    <option value="gutenberg3">Gutenberg: The Great Gatsby</option>
+                </select>
+            </div>
+            
+            <div class="custom-url">
+                <input type="text" id="custom-url" placeholder="Or enter URL to plain text file (CORS enabled sites only)">
+                <button id="load-url-btn" class="secondary-btn">Load from URL</button>
+            </div>
+        </div>
+        
+        <div class="loader" id="loader"></div>
+        
+        <div class="results-section" id="results-container">
+            <!-- Analysis results will be inserted here -->
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const textInput = document.getElementById('text-input');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const loadSampleBtn = document.getElementById('load-sample-btn');
+            const loadUrlBtn = document.getElementById('load-url-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const resultsContainer = document.getElementById('results-container');
+            const loader = document.getElementById('loader');
+            const sampleSelector = document.getElementById('sample-selector');
+            const customUrlInput = document.getElementById('custom-url');
+            
+            // Sample text URLs
+            const sampleUrls = {
+                gutenberg1: 'https://www.gutenberg.org/files/1342/1342-0.txt', // Pride and Prejudice
+                gutenberg2: 'https://www.gutenberg.org/files/11/11-0.txt',      // Alice in Wonderland
+                gutenberg3: 'https://www.gutenberg.org/cache/epub/64317/pg64317.txt' // The Great Gatsby
+            };
+            
+            // Button event listeners
+            analyzeBtn.addEventListener('click', analyzeText);
+            loadSampleBtn.addEventListener('click', loadSample);
+            loadUrlBtn.addEventListener('click', loadFromCustomUrl);
+            clearBtn.addEventListener('click', clearAll);
+            
+            // Basic character analysis
+            function analyzeCharacters(text) {
+                // Create a results card
+                const card = document.createElement('div');
+                card.className = 'analysis-card';
+                
+                // Set up card header
+                const header = document.createElement('h2');
+                header.className = 'card-header';
+                header.textContent = 'Basic Analysis';
+                card.appendChild(header);
+                
+                // Calculate statistics
+                const letters = (text.match(/[a-zA-Z]/g) || []).length;
+                const words = (text.match(/\b\w+\b/g) || []).length;
+                const spaces = (text.match(/\s/g) || []).length;
+                const newlines = (text.match(/\n/g) || []).length;
+                const specialSymbols = (text.match(/[^\w\s]/g) || []).length;
+                
+                // Create content
+                const content = `
+                    <div class="count-item">
+                        <span>Letters:</span>
+                        <span>${letters}</span>
+                    </div>
+                    <div class="count-item">
+                        <span>Words:</span>
+                        <span>${words}</span>
+                    </div>
+                    <div class="count-item">
+                        <span>Spaces:</span>
+                        <span>${spaces}</span>
+                    </div>
+                    <div class="count-item">
+                        <span>Newlines:</span>
+                        <span>${newlines}</span>
+                    </div>
+                    <div class="count-item">
+                        <span>Special Symbols:</span>
+                        <span>${specialSymbols}</span>
+                    </div>
+                `;
+                
+                card.innerHTML += content;
+                return card;
+            }
+            
+            // Analyze pronouns
+            function analyzePronouns(text) {
+                // Create a results card
+                const card = document.createElement('div');
+                card.className = 'analysis-card';
+                
+                // Set up card header
+                const header = document.createElement('h2');
+                header.className = 'card-header';
+                header.textContent = 'Pronoun Analysis';
+                card.appendChild(header);
+                
+                // List of common pronouns
+                const pronouns = [
+                    "i", "me", "my", "mine", "myself",
+                    "you", "your", "yours", "yourself", "yourselves",
+                    "he", "him", "his", "himself",
+                    "she", "her", "hers", "herself",
+                    "it", "its", "itself",
+                    "we", "us", "our", "ours", "ourselves",
+                    "they", "them", "their", "theirs", "themselves",
+                    "this", "that", "these", "those",
+                    "who", "whom", "whose", "which", "what"
+                ];
+                
+                // Tokenize and count
+                const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+                const pronounCount = {};
+                
+                words.forEach(word => {
+                    if (pronouns.includes(word)) {
+                        pronounCount[word] = (pronounCount[word] || 0) + 1;
+                    }
+                });
+                
+                // Sort by frequency
+                const sortedPronouns = Object.entries(pronounCount)
+                    .sort((a, b) => b[1] - a[1]);
+                
+                // Create content
+                let content = '<div class="word-list">';
+                
+                if (sortedPronouns.length === 0) {
+                    content += '<p>No pronouns found in the text.</p>';
+                } else {
+                    sortedPronouns.forEach(([pronoun, count]) => {
+                        content += `
+                            <div class="count-item">
+                                <span>${pronoun}</span>
+                                <span>${count}</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                content += '</div>';
+                card.innerHTML += content;
+                return card;
+            }
+            
+            // Analyze prepositions
+            function analyzePrepositions(text) {
+                // Create a results card
+                const card = document.createElement('div');
+                card.className = 'analysis-card';
+                
+                // Set up card header
+                const header = document.createElement('h2');
+                header.className = 'card-header';
+                header.textContent = 'Preposition Analysis';
+                card.appendChild(header);
+                
+                // List of common prepositions
+                const prepositions = [
+                    "about", "above", "across", "after", "against", "along", "amid", "among",
+                    "around", "as", "at", "before", "behind", "below", "beneath", "beside",
+                    "between", "beyond", "by", "down", "during", "except", "for", "from",
+                    "in", "inside", "into", "like", "near", "of", "off", "on", "onto",
+                    "out", "outside", "over", "past", "regarding", "round", "since", "through",
+                    "throughout", "to", "toward", "towards", "under", "underneath", "until",
+                    "unto", "up", "upon", "with", "within", "without"
+                ];
+                
+                // Tokenize and count
+                const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+                const prepCount = {};
+                
+                words.forEach(word => {
+                    if (prepositions.includes(word)) {
+                        prepCount[word] = (prepCount[word] || 0) + 1;
+                    }
+                });
+                
+                // Sort by frequency
+                const sortedPreps = Object.entries(prepCount)
+                    .sort((a, b) => b[1] - a[1]);
+                
+                // Create content
+                let content = '<div class="word-list">';
+                
+                if (sortedPreps.length === 0) {
+                    content += '<p>No prepositions found in the text.</p>';
+                } else {
+                    sortedPreps.forEach(([prep, count]) => {
+                        content += `
+                            <div class="count-item">
+                                <span>${prep}</span>
+                                <span>${count}</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                content += '</div>';
+                card.innerHTML += content;
+                return card;
+            }
+            
+            // Analyze indefinite articles
+            function analyzeIndefiniteArticles(text) {
+                // Create a results card
+                const card = document.createElement('div');
+                card.className = 'analysis-card';
+                
+                // Set up card header
+                const header = document.createElement('h2');
+                header.className = 'card-header';
+                header.textContent = 'Indefinite Article Analysis';
+                card.appendChild(header);
+                
+                // List of indefinite articles
+                const indefiniteArticles = ["a", "an", "some", "any", "each", "every", "certain", "another", "either", "neither", "many", "few", "several", "one"];
+                
+                // Tokenize and count
+                const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+                const articleCount = {};
+                
+                words.forEach(word => {
+                    if (indefiniteArticles.includes(word)) {
+                        articleCount[word] = (articleCount[word] || 0) + 1;
+                    }
+                });
+                
+                // Sort by frequency
+                const sortedArticles = Object.entries(articleCount)
+                    .sort((a, b) => b[1] - a[1]);
+                
+                // Create content
+                let content = '<div class="word-list">';
+                
+                if (sortedArticles.length === 0) {
+                    content += '<p>No indefinite articles found in the text.</p>';
+                } else {
+                    sortedArticles.forEach(([article, count]) => {
+                        content += `
+                            <div class="count-item">
+                                <span>${article}</span>
+                                <span>${count}</span>
+                            </div>
+                        `;
+                    });
+                }
+                
+                content += '</div>';
+                card.innerHTML += content;
+                return card;
+            }
+            
+            // Function to analyze text
+            function analyzeText() {
+                const text = textInput.value.trim();
+                
+                if (text === '') {
+                    alert('Please enter some text to analyze.');
+                    return;
+                }
+                
+                // Show loading
+                loader.style.display = 'block';
+                resultsContainer.innerHTML = '';
+                
+                // Use setTimeout to allow the UI to update before processing
+                setTimeout(() => {
+                    // Run analysis functions
+                    const charAnalysis = analyzeCharacters(text);
+                    const pronounAnalysis = analyzePronouns(text);
+                    const prepAnalysis = analyzePrepositions(text);
+                    const articleAnalysis = analyzeIndefiniteArticles(text);
+                    
+                    // Add results to container
+                    resultsContainer.appendChild(charAnalysis);
+                    resultsContainer.appendChild(pronounAnalysis);
+                    resultsContainer.appendChild(prepAnalysis);
+                    resultsContainer.appendChild(articleAnalysis);
+                    
+                    // Hide loading
+                    loader.style.display = 'none';
+                }, 100);
+            }
+            
+            // Function to load sample text from URL
+            function loadSample() {
+                const selectedSample = sampleSelector.value;
+                const url = sampleUrls[selectedSample];
+                
+                loader.style.display = 'block';
+                textInput.value = 'Loading...';
+                
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Network response was not ok: ${response.status}`);
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        textInput.value = data;
+                        loader.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching sample text:', error);
+                        textInput.value = 'Error loading sample text. Please try another sample or enter text manually.';
+                        loader.style.display = 'none';
+                    });
+            }
+            
+            // Function to load text from custom URL
+            function loadFromCustomUrl() {
+                const url = customUrlInput.value.trim();
+                
+                if (!url) {
+                    alert('Please enter a URL to a text file.');
+                    return;
+                }
+                
+                loader.style.display = 'block';
+                textInput.value = 'Loading...';
+                
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Network response was not ok: ${response.status}`);
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        textInput.value = data;
+                        loader.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching from URL:', error);
+                        textInput.value = 'Error loading text from URL. This might be due to CORS restrictions or an invalid URL.';
+                        loader.style.display = 'none';
+                    });
+            }
+            
+            // Function to clear all
+            function clearAll() {
+                textInput.value = '';
+                resultsContainer.innerHTML = '';
+                customUrlInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html>

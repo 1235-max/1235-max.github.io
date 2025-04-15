@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sara Bansal - Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #e94560;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+        .portfolio-container {
+            display: flex;
+            background: rgba(22, 33, 62, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+            max-width: 1100px;
+            width: 95%;
+            transition: all 0.5s ease;
+        }
+        .portfolio-container:hover {
+            transform: rotateY(-5deg) scale(1.02);
+        }
+        .image-section {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(45deg, #0f3460, #16213e);
+        }
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .side-images {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .side-images img {
+            width: 120px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #e94545;
+            transition: all 0.3s ease;
+        }
+        .side-images img:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 10px 20px rgba(233,69,96,0.3);
+        }
+        .content-section {
+            flex: 1;
+            padding: 40px;
+            background: rgba(22, 33, 62, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .section {
+            margin-bottom: 30px;
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .section h2 {
+            color: #e9454d;
+            border-bottom: 2px solid #e94560;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        .section p, .section ul {
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        .section ul {
+            padding-left: 20px;
+        }
+        .section li {
+            margin-bottom: 10px;
+        }
+        .highlight {
+            color: #e94545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="portfolio-container">
+        <div class="image-section">
+            <img src="image.png" alt="Sara Bansal" class="main-image">
+           
+        </div>
+        <div class="content-section">
+            <div class="section">
+                <h2>About Me</h2>
+                <p>
+                    <span class="highlight">Hello there!</span> I'm Sara Bansal, a passionate and creative soul who loves to explore new ideas and bring them to life. 
+                    With an eye for aesthetics and a heart full of dreams, I believe in making every moment beautiful. 
+                    Whether it's through art, technology, or storytelling, I strive to leave a mark that inspires others.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>Education Background</h2>
+                <ul>
+                    <li>
+                        <span class="highlight">Bachelor of Technology in Computer Science</span><br>
+                        IIIT Hyderabad, 2024-2028
+                    </li>
+                    <li>
+                        <span class="highlight">Higher Secondary Education</span><br>
+                        Khemo Devi Public School, Science Stream, 2022-2024<br>
+                        Percentage: 95%
+                    </li>
+                    <li>
+                        <span class="highlight">Secondary Education</span><br>
+                        Our Lady of Fatima Convent Secondary School, 2012-2022<br>
+                        Percentage: 98.4%
+                    </li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Academic Achievements</h2>
+                <ul>
+                    <li>JEE MAINS-AIR-3041</li>
+                    <li>3rd place in National level Abacus Competition</li>
+                    <li>Scholarship for Consistent Academic Performance</li>
+                   
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
